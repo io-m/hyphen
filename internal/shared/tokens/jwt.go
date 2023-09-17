@@ -20,9 +20,9 @@ func NewJWTProtector() IProtector {
 }
 
 // TODO: Implement NewJWTProtector to be IAuthenticator
-func (protector *jwtAuthenticator) GenerateTokens(claims *Claims) (string, string, error) {
+func (protector *jwtAuthenticator) GenerateTokens(claims *Claims) (*string, *string, error) {
 
-	return "", "", nil
+	return nil, nil, nil
 }
 
 // TODO: Implement NewJWTProtector to be IAuthenticator

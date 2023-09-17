@@ -45,23 +45,23 @@ func (protector *pasetoProtector) VerifyToken(stringifiedToken string) (*Claims,
 	return claims, nil
 }
 
-func (protector *pasetoProtector) GenerateTokens(claims *Claims) (string, string, error) {
+func (protector *pasetoProtector) GenerateTokens(claims *Claims) (*string, *string, error) {
 	protector.token.SetExpiration(claims.ExpiredAt)
 	protector.token.SetIssuedAt(claims.IssuedAt)
-	protector.token.SetSubject(claims.SubjectID.String())
+	protector.token.SetSubject(fmt.Sprintf("%d", claims.SubjectID))
 	protector.token.SetJti(claims.ClaimID.String())
 	// protector.token.Set("roles", claims.Roles)
 	symmetricAccessTokenKey, err := paseto.V4SymmetricKeyFromBytes(protector.accessTokenSecretKey)
 	if err != nil {
-		return "", "", fmt.Errorf("paseto could not generate V4Symmetric key for access token: %w", err)
+		return nil, nil, fmt.Errorf("paseto could not generate V4Symmetric key for access token: %w", err)
 	}
 	symmetricRefreshTokenKey, err := paseto.V4SymmetricKeyFromBytes(protector.refreshTokenSecretKey)
 	if err != nil {
-		return "", "", fmt.Errorf("paseto could not generate V4Symmetric key for refresh token: %w", err)
+		return nil, nil, fmt.Errorf("paseto could not generate V4Symmetric key for refresh token: %w", err)
 	}
 	encryptedAccessTokenKey := protector.token.V4Encrypt(symmetricAccessTokenKey, nil)
 	encryptedRefreshTokenKey := protector.token.V4Encrypt(symmetricRefreshTokenKey, nil)
-	return encryptedAccessTokenKey, encryptedRefreshTokenKey, nil
+	return &encryptedAccessTokenKey, &encryptedRefreshTokenKey, nil
 }
 
 //	func (protector *pasetoProtector) SaveRefreshToken(ctx context.Context, customerId uuid.UUID, refreshToken string) error {

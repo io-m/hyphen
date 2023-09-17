@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/google/uuid"
 	"github.com/io-m/hyphen/pkg/constants"
 )
 
@@ -19,9 +18,9 @@ const (
 )
 
 type ITokens interface {
-	SaveRefreshToken(ctx context.Context, customerId uuid.UUID, refreshToken string) error
-	DeleteRefreshToken(ctx context.Context, customerId uuid.UUID, refreshToken string) error
-	RetrieveRefreshToken(ctx context.Context, customerId uuid.UUID, refreshToken string) (string, error)
+	SaveRefreshToken(ctx context.Context, userId uint, refreshToken string) error
+	DeleteRefreshToken(ctx context.Context, userId uint, refreshToken string) error
+	RetrieveRefreshToken(ctx context.Context, userId uint, refreshToken string) (string, error)
 }
 
 type tokens struct {
@@ -34,8 +33,8 @@ func NewTokens(redis *redis.Client) *tokens {
 	}
 }
 
-func (t *tokens) SaveRefreshToken(ctx context.Context, customerId uuid.UUID, refreshToken string) error {
-	err := t.redis.HSet(ctx, customerId.String(), "refreshToken", refreshToken)
+func (t *tokens) SaveRefreshToken(ctx context.Context, userId uint, refreshToken string) error {
+	err := t.redis.HSet(ctx, fmt.Sprintf("%d", userId), "refreshToken", refreshToken)
 
 	if err != nil {
 		return err.Err()
@@ -43,7 +42,7 @@ func (t *tokens) SaveRefreshToken(ctx context.Context, customerId uuid.UUID, ref
 	return nil
 }
 
-func (t *tokens) RetrieveRefreshToken(ctx context.Context, customerId uuid.UUID, refreshToken string) (string, error) {
+func (t *tokens) RetrieveRefreshToken(ctx context.Context, userId uint, refreshToken string) (string, error) {
 	rt, err := t.redis.Get(ctx, constants.REFRESH_TOKEN_KEY).Result()
 	if err != redis.Nil {
 		return "", fmt.Errorf("%s key does not exist: %w", constants.REFRESH_TOKEN_KEY, err)
@@ -53,6 +52,6 @@ func (t *tokens) RetrieveRefreshToken(ctx context.Context, customerId uuid.UUID,
 	return rt, nil
 }
 
-func (t *tokens) DeleteRefreshToken(ctx context.Context, customerId uuid.UUID, refreshToken string) error {
+func (t *tokens) DeleteRefreshToken(ctx context.Context, userId uint, refreshToken string) error {
 	return nil
 }

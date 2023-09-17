@@ -1,14 +1,24 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
-	ID             int        `json:"id" db:"id"`
-	Email          string     `json:"email" db:"email"`
-	HashedPassword string     `json:"-" db:"hashed_password"`
-	FirstName      string     `json:"first_name" db:"first_name"`
-	LastName       string     `json:"last_name" db:"last_name"`
-	AddressID      int        `json:"address_id" db:"address_id"`
-	CreatedAt      time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt      *time.Time `json:"updated_at" db:"updated_at"`
+	ID        uint       `json:"id,omitempty" db:"id"`
+	Email     string     `json:"email,omitempty" db:"email"`
+	Password  string     `json:"password,omitempty" db:"hashed_password"`
+	CreatedAt time.Time  `json:"created_at,omitempty" db:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty" db:"updated_at"`
+}
+
+type UserUpdateRequest struct {
+	Email       *string `json:"email,omitempty"`
+	OldPassword *string `json:"old_password,omitempty"`
+	NewPassword *string `json:"new_password,omitempty"`
+	UpdatedAt   *string `json:"updated_at,omitempty"`
+}
+
+func EmptyUser() User {
+	return User{}
 }
