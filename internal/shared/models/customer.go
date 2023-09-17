@@ -11,3 +11,7 @@ type Customer struct {
 	Bio         *string    `json:"bio,omitempty" db:"bio"`
 	BirthDate   *time.Time `json:"birth_date,omitempty" db:"birth_date"`
 }
+
+func EmptyCustomer() Customer {
+	return Customer{}
+}
