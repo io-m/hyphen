@@ -3,6 +3,12 @@ run:
 	@echo "Running Main function..."
 	go run ./cmd/main.go
 
+db-test-up:
+	docker-compose -f infra/docker-compose.tst.yml up
+
+db-test-down:
+	docker-compose -f infra/docker-compose.tst.yml down
+
 db-dev-up:
 	docker-compose -f infra/docker-compose.dev.yml up
 

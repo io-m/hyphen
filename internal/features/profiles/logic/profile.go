@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	profile_repository "github.com/io-m/hyphen/internal/features/profiles/repository"
+	"github.com/io-m/hyphen/internal/shared"
 	"github.com/io-m/hyphen/internal/shared/models"
 	"github.com/io-m/hyphen/internal/shared/tokens"
 	"github.com/io-m/hyphen/pkg/constants"
@@ -15,8 +16,8 @@ import (
 type IProfileLogic interface {
 	GetProfileWithEmail(ctx context.Context, ProfileId uint) (models.Profile, error)
 	GetProfileWithId(ctx context.Context, ProfileId uint) (models.Profile, error)
-	RegisterProfile(ctx context.Context, Profile *models.Profile) (int64, error)
-	Login(ctx context.Context, Profile *models.Profile) (models.Profile, *string, *string, error)
+	RegisterProfile(ctx context.Context, Profile *models.Profile) (shared.ItemID, error)
+	Login(ctx context.Context, Profile *models.Profile) (shared.ItemID, *string, *string, error)
 	OAuth(ctx context.Context, Profile *models.Profile) (models.Profile, error)
 	UpdateProfileWithId(ctx context.Context, ProfileId uint, ProfileRequestOptional *models.ProfileUpdateRequest) (models.Profile, error)
 	DeleteProfileWithId(ctx context.Context, ProfileId uint) (bool, error)
@@ -52,47 +53,51 @@ func (ul *profileLogic) DeleteProfileWithId(ctx context.Context, profileId uint)
 	return false, nil
 }
 
-func (ul *profileLogic) RegisterProfile(ctx context.Context, profile *models.Profile) (int64, error) {
+func (ul *profileLogic) RegisterProfile(ctx context.Context, profile *models.Profile) (shared.ItemID, error) {
 	if err := helpers.ValidatePassword(profile.Password); err != nil {
-		return 0, errors.New("password is invalid")
+		return shared.ItemID{}, errors.New("password is invalid")
 	}
 	if err := helpers.ValidateEmail(profile.Email); err != nil {
-		return 0, errors.New("email is invalid")
+		return shared.ItemID{}, errors.New("email is invalid")
 	}
 	hashedPassword, err := helpers.HashPassword(profile.Password)
 	if err != nil {
-		return 0, fmt.Errorf("error while hashing password: %w", err)
+		return shared.ItemID{}, fmt.Errorf("error while hashing password: %w", err)
 	}
 	profile.Password = hashedPassword
 	createdProfileId, err := ul.profileRepository.CreateProfile(ctx, profile)
 
 	if err != nil {
-		return 0, err
+		return shared.ItemID{}, err
 	}
-	return createdProfileId, nil
+	return shared.ItemID{
+		ID: createdProfileId,
+	}, nil
 }
 
-func (ul *profileLogic) Login(ctx context.Context, profile *models.Profile) (models.Profile, *string, *string, error) {
+func (ul *profileLogic) Login(ctx context.Context, profile *models.Profile) (shared.ItemID, *string, *string, error) {
 	foundProfile, err := ul.profileRepository.FindProfileByEmail(ctx, profile.Email)
 	if err != nil {
-		return models.EmptyProfile(), nil, nil, err
+		return shared.ItemID{}, nil, nil, err
 	}
 	if err := helpers.CheckPassword(profile.Password, foundProfile.Password); err != nil {
-		return models.EmptyProfile(), nil, nil, fmt.Errorf("wrong password: %w", err)
+		return shared.ItemID{}, nil, nil, fmt.Errorf("wrong password: %w", err)
 	}
 	claims, err := tokens.NewClaims(profile.ID, constants.ACCESS_TOKEN_DURATION)
 	if err != nil {
-		return models.EmptyProfile(), nil, nil, err
+		return shared.ItemID{}, nil, nil, err
 	}
 	accessToken, refreshToken, err := ul.protector.GenerateTokens(claims)
 	if err != nil {
-		return models.EmptyProfile(), nil, nil, err
+		return shared.ItemID{}, nil, nil, err
 	}
 	// Here we need to save refresh token in Redis
 	if err := ul.tokens.SaveRefreshToken(ctx, foundProfile.ID, *refreshToken); err != nil {
-		return models.EmptyProfile(), nil, nil, err
+		return shared.ItemID{}, nil, nil, err
 	}
-	return foundProfile, accessToken, refreshToken, nil
+	return shared.ItemID{
+		ID: foundProfile.ID,
+	}, accessToken, refreshToken, nil
 }
 
 func (ul *profileLogic) OAuth(ctx context.Context, profile *models.Profile) (models.Profile, error) {
