@@ -1,6 +1,6 @@
 package models
 
-type UserImage struct {
-	UserID  int `json:"user_id" db:"user_id"`
-	ImageID int `json:"image_id" db:"image_id"`
+type ProfileImage struct {
+	ProfileID int `json:"profile_id" db:"profile_id"`
+	ImageID   int `json:"image_id" db:"image_id"`
 }

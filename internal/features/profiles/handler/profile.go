@@ -33,12 +33,12 @@ func (uah *profileAuthHandler) Register(w http.ResponseWriter, r *http.Request) 
 		helpers.ErrorResponse(w, fmt.Errorf("error while decoding payload: %w", err), http.StatusBadRequest)
 		return
 	}
-	profileResponse, err := uah.profileLogic.RegisterProfile(r.Context(), profileRequest)
+	profileId, err := uah.profileLogic.RegisterProfile(r.Context(), profileRequest)
 	if err != nil {
 		helpers.ErrorResponse(w, fmt.Errorf("could not register: %w", err), http.StatusBadRequest)
 		return
 	}
-	helpers.SuccessResponse(w, profileResponse, "profile successfully registered", http.StatusCreated)
+	helpers.SuccessResponse(w, profileId, "profile successfully registered", http.StatusCreated)
 }
 
 func (uah *profileAuthHandler) Login(w http.ResponseWriter, r *http.Request) {

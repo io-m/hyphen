@@ -1,20 +1,25 @@
 package db_connection
 
 import (
-	"fmt"
+	"database/sql"
+	"log"
 	"os"
 
 	"github.com/io-m/hyphen/pkg/constants"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-func NewPostgresConnection() (*sqlx.DB, error) {
+func NewPostgresConnection() (*sql.DB, error) {
 	connStr := os.Getenv(constants.POSTGRES_CONNECTION)
-	// Instead of sql.Open, we use sqlx.Connect. This method combines sql.Open and db.Ping for us.
-	db, err := sqlx.Connect(constants.DRIVER, connStr)
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to Postgres: %w", err)
+		log.Fatalf("error opening database: %v", err)
 	}
+
+	// Ping check to make sure connection is alive
+	if err = db.Ping(); err != nil {
+		log.Fatalf("error pinging database: %v", err)
+	}
+
 	return db, nil
 }

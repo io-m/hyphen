@@ -26,13 +26,13 @@ func NewProtector() IProtector {
 
 type Claims struct {
 	ClaimID   uuid.UUID `json:"jti"`
-	SubjectID uint      `json:"sub"`
+	SubjectID int64     `json:"sub"`
 	IssuedAt  time.Time `json:"iat"`
 	ExpiredAt time.Time `json:"exp"`
 	// Roles     []entities.AuthorizationLevel `json:"roles,omitempty"`
 }
 
-func NewClaims(subjectID uint, duration time.Duration) (*Claims, error) {
+func NewClaims(subjectID int64, duration time.Duration) (*Claims, error) {
 	claimID, err := uuid.NewRandom()
 	if err != nil {
 		return nil, errors.New("could not generate claims")

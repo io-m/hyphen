@@ -15,7 +15,7 @@ import (
 type IProfileLogic interface {
 	GetProfileWithEmail(ctx context.Context, ProfileId uint) (models.Profile, error)
 	GetProfileWithId(ctx context.Context, ProfileId uint) (models.Profile, error)
-	RegisterProfile(ctx context.Context, Profile *models.Profile) (models.Profile, error)
+	RegisterProfile(ctx context.Context, Profile *models.Profile) (int64, error)
 	Login(ctx context.Context, Profile *models.Profile) (models.Profile, *string, *string, error)
 	OAuth(ctx context.Context, Profile *models.Profile) (models.Profile, error)
 	UpdateProfileWithId(ctx context.Context, ProfileId uint, ProfileRequestOptional *models.ProfileUpdateRequest) (models.Profile, error)
@@ -52,32 +52,32 @@ func (ul *profileLogic) DeleteProfileWithId(ctx context.Context, profileId uint)
 	return false, nil
 }
 
-func (ul *profileLogic) RegisterProfile(ctx context.Context, profile *models.Profile) (models.Profile, error) {
+func (ul *profileLogic) RegisterProfile(ctx context.Context, profile *models.Profile) (int64, error) {
 	if err := helpers.ValidatePassword(profile.Password); err != nil {
-		return models.EmptyProfile(), errors.New("password is invalid")
+		return 0, errors.New("password is invalid")
 	}
 	if err := helpers.ValidateEmail(profile.Email); err != nil {
-		return models.EmptyProfile(), errors.New("email is invalid")
+		return 0, errors.New("email is invalid")
 	}
 	hashedPassword, err := helpers.HashPassword(profile.Password)
 	if err != nil {
-		return models.EmptyProfile(), fmt.Errorf("error while hashing password: %w", err)
+		return 0, fmt.Errorf("error while hashing password: %w", err)
 	}
 	profile.Password = hashedPassword
-	createdPerson, err := ul.profileRepository.CreateProfile(ctx, profile)
+	createdProfileId, err := ul.profileRepository.CreateProfile(ctx, profile)
 
 	if err != nil {
-		return models.EmptyProfile(), err
+		return 0, err
 	}
-	return createdPerson, nil
+	return createdProfileId, nil
 }
 
 func (ul *profileLogic) Login(ctx context.Context, profile *models.Profile) (models.Profile, *string, *string, error) {
-	foundprofile, err := ul.profileRepository.FindProfileByEmail(ctx, profile.Email)
+	foundProfile, err := ul.profileRepository.FindProfileByEmail(ctx, profile.Email)
 	if err != nil {
 		return models.EmptyProfile(), nil, nil, err
 	}
-	if err := helpers.CheckPassword(profile.Password, foundprofile.Password); err != nil {
+	if err := helpers.CheckPassword(profile.Password, foundProfile.Password); err != nil {
 		return models.EmptyProfile(), nil, nil, fmt.Errorf("wrong password: %w", err)
 	}
 	claims, err := tokens.NewClaims(profile.ID, constants.ACCESS_TOKEN_DURATION)
@@ -89,10 +89,10 @@ func (ul *profileLogic) Login(ctx context.Context, profile *models.Profile) (mod
 		return models.EmptyProfile(), nil, nil, err
 	}
 	// Here we need to save refresh token in Redis
-	if err := ul.tokens.SaveRefreshToken(ctx, foundprofile.ID, *refreshToken); err != nil {
+	if err := ul.tokens.SaveRefreshToken(ctx, foundProfile.ID, *refreshToken); err != nil {
 		return models.EmptyProfile(), nil, nil, err
 	}
-	return foundprofile, accessToken, refreshToken, nil
+	return foundProfile, accessToken, refreshToken, nil
 }
 
 func (ul *profileLogic) OAuth(ctx context.Context, profile *models.Profile) (models.Profile, error) {

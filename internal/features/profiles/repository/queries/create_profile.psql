@@ -1,0 +1,6 @@
+
+INSERT INTO profiles
+    (email, hashed_password)
+VALUES
+    ($1, $2)
+RETURNING id;
