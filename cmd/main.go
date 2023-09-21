@@ -9,8 +9,8 @@ import (
 	"syscall"
 
 	"github.com/go-chi/chi/v5"
-	di "github.com/io-m/hyphen/internal/dependency"
 
+	"github.com/io-m/hyphen/internal/routes"
 	"github.com/io-m/hyphen/internal/shared/config"
 	db_connection "github.com/io-m/hyphen/internal/shared/db"
 	"github.com/io-m/hyphen/pkg/constants"
@@ -48,7 +48,7 @@ func main() {
 
 	port := os.Getenv(constants.APP_PORT)
 	slog.Info("listening on port: %s............\n", port)
-	di.ConfigureRoutes(appConfig)
+	routes.ConfigureRoutes(appConfig)
 
 	// Run server in separate goroutine
 	go func() {

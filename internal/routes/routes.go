@@ -1,4 +1,4 @@
-package di
+package routes
 
 import (
 	"net/http"
