@@ -1,4 +1,4 @@
-package config
+package dependency
 
 import (
 	"database/sql"
@@ -10,40 +10,40 @@ import (
 	"github.com/io-m/hyphen/internal/shared/tokens"
 )
 
-type AppConfig struct {
-	mux          *chi.Mux
+type Dependencies struct {
+	multiplexer  *chi.Mux
 	router       chi.Router
 	postgres     *sql.DB
 	redisClient  *redis.Client
 	profileLogic profile_logic.IProfileLogic
 }
 
-func NewAppConfig(pg *sql.DB, redis *redis.Client) *AppConfig {
+func NewDependencies(pg *sql.DB, redis *redis.Client) *Dependencies {
 	tokenLogic := tokens.NewTokens(redis)
 	protector := tokens.NewProtector()
-	return &AppConfig{
-		mux:          chi.NewRouter(),
+	return &Dependencies{
+		multiplexer:  chi.NewRouter(),
 		postgres:     pg,
 		redisClient:  redis,
 		profileLogic: profile_logic.NewProfileLogic(profile_repository.NewProfileRepository(pg, redis), tokenLogic, protector),
 	}
 }
 
-func (ac *AppConfig) GetRouter() chi.Router {
-	return ac.router
+func (dep *Dependencies) GetRouter() chi.Router {
+	return dep.router
 }
-func (ac *AppConfig) GetMux() *chi.Mux {
-	return ac.mux
+func (dep *Dependencies) GetMux() *chi.Mux {
+	return dep.multiplexer
 }
-func (ac *AppConfig) GetPostgres() *sql.DB {
-	return ac.postgres
+func (dep *Dependencies) GetPostgres() *sql.DB {
+	return dep.postgres
 }
-func (ac *AppConfig) GetRedis() *redis.Client {
-	return ac.redisClient
+func (dep *Dependencies) GetRedis() *redis.Client {
+	return dep.redisClient
 }
-func (ac *AppConfig) GetProfileLogic() profile_logic.IProfileLogic {
-	return ac.profileLogic
+func (dep *Dependencies) GetProfileLogic() profile_logic.IProfileLogic {
+	return dep.profileLogic
 }
-func (ac *AppConfig) SetRouter(router chi.Router) {
-	ac.router = router
+func (dep *Dependencies) SetRouter(router chi.Router) {
+	dep.router = router
 }

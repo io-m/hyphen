@@ -7,11 +7,11 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/io-m/hyphen/internal/features/profiles"
-	"github.com/io-m/hyphen/internal/shared/config"
+	dependency "github.com/io-m/hyphen/internal/shared/config"
 	"github.com/io-m/hyphen/pkg/constants"
 )
 
-func ConfigureRoutes(config *config.AppConfig) {
+func ConfigureRoutes(config *dependency.Dependencies) {
 	config.GetMux().Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://*", "https://*"},
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions},

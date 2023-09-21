@@ -3,10 +3,10 @@ package profiles
 import (
 	"github.com/go-chi/chi/v5"
 	profile_handler "github.com/io-m/hyphen/internal/features/profiles/handler"
-	"github.com/io-m/hyphen/internal/shared/config"
+	dependency "github.com/io-m/hyphen/internal/shared/config"
 )
 
-func SetAndRunProfileRoutes(config *config.AppConfig) {
+func SetAndRunProfileRoutes(config *dependency.Dependencies) {
 	profileHandler := profile_handler.NewProfileAuthHandler(config.GetProfileLogic())
 
 	/* AUTH ROUTES */

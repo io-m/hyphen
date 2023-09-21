@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/io-m/hyphen/internal/routes"
-	"github.com/io-m/hyphen/internal/shared/config"
+	dependency "github.com/io-m/hyphen/internal/shared/config"
 	db_connection "github.com/io-m/hyphen/internal/shared/db"
 	"github.com/io-m/hyphen/pkg/constants"
 	"github.com/io-m/hyphen/pkg/helpers"
@@ -44,15 +44,15 @@ func main() {
 	}()
 
 	// Global singleton
-	appConfig := config.NewAppConfig(postgresConnection, redisClient)
+	dependencies := dependency.NewDependencies(postgresConnection, redisClient)
 
 	port := os.Getenv(constants.APP_PORT)
 	slog.Info("listening on port: %s............\n", port)
-	routes.ConfigureRoutes(appConfig)
+	routes.ConfigureRoutes(dependencies)
 
 	// Run server in separate goroutine
 	go func() {
-		runServer(port, appConfig.GetMux())
+		runServer(port, dependencies.GetMux())
 	}()
 
 	// Handling graceful shutdown
