@@ -11,20 +11,20 @@ import (
 	"github.com/io-m/hyphen/pkg/constants"
 )
 
-func ConfigureRoutes(config *dependency.Dependencies) {
-	config.GetMux().Use(cors.Handler(cors.Options{
+func ConfigureRoutes(dep *dependency.Dependencies) {
+	dep.GetMux().Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://*", "https://*"},
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions},
 		AllowedHeaders:   []string{"Authorization", "Content-Type", "Accept", "X-CSRF-Token"},
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
-	config.GetMux().Use(middleware.Heartbeat("/ping"))
-	config.GetMux().Use(middleware.Logger)
-	config.GetMux().Use(middleware.Recoverer)
-	config.GetMux().Route(constants.BASE_ROUTE, func(r chi.Router) {
-		config.SetRouter(r)
+	dep.GetMux().Use(middleware.Heartbeat("/ping"))
+	dep.GetMux().Use(middleware.Logger)
+	dep.GetMux().Use(middleware.Recoverer)
+	dep.GetMux().Route(constants.BASE_ROUTE, func(r chi.Router) {
+		dep.SetRouter(r)
 		/* ROUTES COME HERE*/
-		profiles.SetAndRunProfileRoutes(config)
+		profiles.SetAndRunProfileRoutes(dep)
 	})
 }

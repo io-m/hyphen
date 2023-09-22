@@ -13,6 +13,7 @@ import (
 type Dependencies struct {
 	multiplexer  *chi.Mux
 	router       chi.Router
+	protector    tokens.IProtector
 	postgres     *sql.DB
 	redisClient  *redis.Client
 	profileLogic profile_logic.IProfileLogic
@@ -24,6 +25,7 @@ func NewDependencies(pg *sql.DB, redis *redis.Client) *Dependencies {
 	return &Dependencies{
 		multiplexer:  chi.NewRouter(),
 		postgres:     pg,
+		protector:    protector,
 		redisClient:  redis,
 		profileLogic: profile_logic.NewProfileLogic(profile_repository.NewProfileRepository(pg, redis), tokenLogic, protector),
 	}
@@ -34,6 +36,9 @@ func (dep *Dependencies) GetRouter() chi.Router {
 }
 func (dep *Dependencies) GetMux() *chi.Mux {
 	return dep.multiplexer
+}
+func (dep *Dependencies) GetProtector() tokens.IProtector {
+	return dep.protector
 }
 func (dep *Dependencies) GetPostgres() *sql.DB {
 	return dep.postgres
