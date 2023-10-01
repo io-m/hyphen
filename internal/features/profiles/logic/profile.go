@@ -14,13 +14,13 @@ import (
 )
 
 type IProfileLogic interface {
-	GetProfileWithEmail(ctx context.Context, ProfileId uint) (models.Profile, error)
-	GetProfileWithId(ctx context.Context, ProfileId uint) (models.Profile, error)
-	RegisterProfile(ctx context.Context, Profile *models.Profile) (shared.ItemID, error)
-	Login(ctx context.Context, Profile *models.Profile) (shared.ItemID, *string, *string, error)
-	OAuth(ctx context.Context, Profile *models.Profile) (models.Profile, error)
-	UpdateProfileWithId(ctx context.Context, ProfileId uint, ProfileRequestOptional *models.ProfileUpdateRequest) (models.Profile, error)
-	DeleteProfileWithId(ctx context.Context, ProfileId uint) (bool, error)
+	GetProfileWithEmail(ctx context.Context, profileId uint) (models.Profile, error)
+	GetProfileWithId(ctx context.Context, profileId uint) (models.Profile, error)
+	RegisterProfile(ctx context.Context, profile *models.Profile) (shared.ItemID, error)
+	Login(ctx context.Context, profile *models.Profile) (shared.ItemID, *string, *string, error)
+	OAuth(ctx context.Context, profile *models.Profile) (models.Profile, error)
+	UpdateProfileWithId(ctx context.Context, profileId uint, profileRequestOptional *models.ProfileUpdateRequest) (models.Profile, error)
+	DeleteProfileWithId(ctx context.Context, profileId uint) (bool, error)
 }
 
 type profileLogic struct {

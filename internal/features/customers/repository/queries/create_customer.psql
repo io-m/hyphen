@@ -1,0 +1,5 @@
+INSERT INTO customers
+    (profile_id, address_id, full_name, gender, bio, blacklisted)
+VALUES
+    ($1, $2, $3, $4, $5, $6)
+RETURNING profile_id;

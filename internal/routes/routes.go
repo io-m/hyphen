@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/io-m/hyphen/internal/features/customers"
 	"github.com/io-m/hyphen/internal/features/profiles"
 	dependency "github.com/io-m/hyphen/internal/shared/dependencies"
 	"github.com/io-m/hyphen/pkg/constants"
@@ -26,5 +27,6 @@ func ConfigureRoutes(dep *dependency.Dependencies) {
 		dep.SetRouter(r)
 		/* ROUTES COME HERE*/
 		profiles.SetAndRunProfileRoutes(dep)
+		customers.SetAndRunCustomerRoutes(dep)
 	})
 }

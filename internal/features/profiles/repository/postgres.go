@@ -42,10 +42,10 @@ func (pr *profileRepository) CreateProfile(ctx context.Context, profile *models.
 	var id int
 	err := pr.postgres.QueryRowContext(ctx, CREATE_PROFILE, profile.Email, profile.Password).Scan(&id)
 	if err != nil {
-		return 0, fmt.Errorf("could not insert profile and retrieve ID: %w", err)
+		return -1, fmt.Errorf("could not insert profile and retrieve ID: %w", err)
 	}
 	if err != nil {
-		return 0, fmt.Errorf("could not insert profile: %w", err)
+		return -1, fmt.Errorf("could not insert profile: %w", err)
 	}
 
 	return id, nil
