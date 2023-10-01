@@ -46,6 +46,7 @@ func (cl *customerLogic) CreateCustomer(ctx context.Context, customerRequest *mo
 		return shared.ItemID{ID: -1}, err
 	}
 	customer := models.MapCustomerRequestToCustomerModel(*customerRequest, item.ID)
+	customer.Blacklisted = false
 	customerItemId, err := cl.customerRepository.CreateCustomer(ctx, &customer)
 	if err != nil {
 		return shared.ItemID{ID: customerItemId}, err

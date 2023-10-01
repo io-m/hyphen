@@ -8,13 +8,21 @@ import (
 )
 
 // ConstructInsertStatement is function that generates INSERT SQL statement taking into account optional fields for Golang struct
-func ConstructInsertStatement(baseTable string, requiredFields map[string]any, optionalFields map[string]any) (string, []any, error) {
+func ConstructInsertStatement(baseTable string, requiredFields map[string]any, optionalFields map[string]any, returningValue ...string) (string, []any, error) {
 	fieldNames := ""
 	placeholders := ""
 	values := []any{}
+	valueToBeReturned := "id"
+	if len(returningValue) == 1 {
+		valueToBeReturned = returningValue[0]
+	}
+
 	if len(requiredFields) == 0 || len(optionalFields) == 0 {
 		return "", nil, errors.New("not any field passed")
+	} else if len(returningValue) > 1 {
+		return "", nil, errors.New("returning values greater than 1")
 	}
+
 	index := 1
 	for rf, rv := range requiredFields {
 		if fieldNames != "" {
@@ -39,7 +47,7 @@ func ConstructInsertStatement(baseTable string, requiredFields map[string]any, o
 		}
 	}
 
-	finalStatement := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) RETURNING id;", baseTable, fieldNames, placeholders)
+	finalStatement := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) RETURNING %s;", baseTable, fieldNames, placeholders, valueToBeReturned)
 	return finalStatement, values, nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/io-m/hyphen/internal/shared/models"
+	"github.com/io-m/hyphen/pkg/helpers"
 )
 
 //go:embed queries/create_customer.psql
@@ -45,7 +46,24 @@ func (cr *customerRepository) FindCustomerById(ctx context.Context, customerId i
 }
 func (cr *customerRepository) CreateCustomer(ctx context.Context, customer *models.Customer) (int, error) {
 	var id int
-	err := cr.postgres.QueryRow(CREATE_CUSTOMER, customer.ProfileID, customer.AddressId, customer.FullName, *customer.Gender, *customer.Bio, customer.Blacklisted).Scan(&id)
+
+	baseTable := "customers"
+	requiredFields := map[string]any{
+		"profile_id":  customer.ProfileID,
+		"full_name":   customer.FullName,
+		"blacklisted": customer.Blacklisted,
+		"address_id":  customer.AddressId,
+	}
+	optionalFields := map[string]any{
+		"gender": customer.Gender,
+		"bio":    customer.Bio,
+	}
+	finalStatement, values, err := helpers.ConstructInsertStatement(baseTable, requiredFields, optionalFields, "profile_id")
+	if err != nil {
+		slog.Debug("Failed to insert customer: %v", err)
+		return -1, err
+	}
+	err = cr.postgres.QueryRow(finalStatement, values...).Scan(&id)
 	if err != nil {
 		slog.Debug("Failed to insert customer: %v", err)
 		return -1, err
