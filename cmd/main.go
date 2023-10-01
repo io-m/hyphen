@@ -11,8 +11,8 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/io-m/hyphen/internal/routes"
-	dependency "github.com/io-m/hyphen/internal/shared/config"
 	db_connection "github.com/io-m/hyphen/internal/shared/db"
+	dependency "github.com/io-m/hyphen/internal/shared/dependencies"
 	"github.com/io-m/hyphen/pkg/constants"
 	"github.com/io-m/hyphen/pkg/helpers"
 )

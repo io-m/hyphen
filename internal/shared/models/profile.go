@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Profile struct {
-	ID        int64      `json:"id,omitempty" db:"id"`
+	ID        int        `json:"id,omitempty" db:"id"`
 	Email     string     `json:"email,omitempty" db:"email"`
 	Password  string     `json:"password,omitempty" db:"hashed_password"`
 	CreatedAt *time.Time `json:"created_at,omitempty" db:"created_at"`

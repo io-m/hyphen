@@ -20,7 +20,7 @@ var FIND_PROFILE_BY_EMAIL string
 func (pr *profileRepository) FindAllProfiles(ctx context.Context) ([]models.Profile, error) {
 	return []models.Profile{models.EmptyProfile()}, nil
 }
-func (pr *profileRepository) FindProfileById(ctx context.Context, profileId uint) (models.Profile, error) {
+func (pr *profileRepository) FindProfileById(ctx context.Context, profileId int) (models.Profile, error) {
 	return models.EmptyProfile(), nil
 }
 func (pr *profileRepository) FindProfileByEmail(ctx context.Context, email string) (models.Profile, error) {
@@ -38,8 +38,8 @@ func (pr *profileRepository) FindProfileByEmail(ctx context.Context, email strin
 	}
 	return profile, nil
 }
-func (pr *profileRepository) CreateProfile(ctx context.Context, profile *models.Profile) (int64, error) {
-	var id int64
+func (pr *profileRepository) CreateProfile(ctx context.Context, profile *models.Profile) (int, error) {
+	var id int
 	err := pr.postgres.QueryRowContext(ctx, CREATE_PROFILE, profile.Email, profile.Password).Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("could not insert profile and retrieve ID: %w", err)
@@ -50,9 +50,9 @@ func (pr *profileRepository) CreateProfile(ctx context.Context, profile *models.
 
 	return id, nil
 }
-func (pr *profileRepository) UpdateProfileById(ctx context.Context, profileId uint, profileRequest *models.ProfileUpdateRequest) (models.Profile, error) {
+func (pr *profileRepository) UpdateProfileById(ctx context.Context, profileId int, profileRequest *models.ProfileUpdateRequest) (models.Profile, error) {
 	return models.EmptyProfile(), nil
 }
-func (r *profileRepository) DeleteProfileById(ctx context.Context, profileId uint) (bool, error) {
+func (r *profileRepository) DeleteProfileById(ctx context.Context, profileId int) (bool, error) {
 	return false, nil
 }

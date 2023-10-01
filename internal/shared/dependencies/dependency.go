@@ -31,6 +31,7 @@ func NewDependencies(pg *sql.DB, redis *redis.Client) *Dependencies {
 	}
 }
 
+// Getters
 func (dep *Dependencies) GetRouter() chi.Router {
 	return dep.router
 }
@@ -49,6 +50,8 @@ func (dep *Dependencies) GetRedis() *redis.Client {
 func (dep *Dependencies) GetProfileLogic() profile_logic.IProfileLogic {
 	return dep.profileLogic
 }
+
+// Setters
 func (dep *Dependencies) SetRouter(router chi.Router) {
 	dep.router = router
 }
